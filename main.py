@@ -1,10 +1,9 @@
 import tkinter as tk
 from tkinter import messagebox
 import json
-from datetime import datetime
-from google.cloud import pubsub_v1
 from threading import Lock
 import environs
+from pubsub_message_listener import Pubsub_message_listener
 
 
 class Pubsub_subscriber:
@@ -22,43 +21,6 @@ class Pubsub_subscriber:
         self.list_items = []
         self.create_gui()
         self.start_gui()
-
-    def pubsub_listener(self):
-        try:
-            project_id = self.project_id_entry.get()
-            subscription_name = self.subscription_name_entry.get()
-
-            subscriber = pubsub_v1.SubscriberClient()
-            subscription_path = subscriber.subscription_path(
-                project_id, subscription_name)
-
-            # Check if path exists
-            subscriber.get_subscription(subscription_path)
-
-            def callback(message):
-                self.add_to_listbox(self.pubsub_message_to_dict(message))
-                message.ack()
-
-            subscriber.subscribe(subscription_path, callback=callback)
-
-            self.update_settings_frame_widgets()
-            self.save_env_file(project_id, subscription_name)
-        except Exception as e:
-            messagebox.showerror("Error", str(e))
-
-    def pubsub_message_to_dict(self, message):
-        attributes = message.attributes
-        data = message.data
-        publish_time = message.publish_time
-        res = {}
-        try:
-            res["receive_time"] = datetime.now().strftime("%Y-%m-%d, %H:%M:%S")
-            res["publish_time"] = publish_time.strftime("%Y-%m-%d, %H:%M:%S")
-            res["attributes"] = dict(attributes)
-            res["data"] = json.loads(data.decode("utf8"))
-        except Exception as e:
-            res["error"] = str(e)
-        return res
 
     def update_settings_frame_widgets(self):
         self.project_id_entry.config(state='disabled')
@@ -96,7 +58,7 @@ class Pubsub_subscriber:
         self.connect_button = tk.Button(self.settings_frame,
                                         text="Connect",
                                         width=15,
-                                        command=self.pubsub_listener)
+                                        command=self.on_connect_button)
         self.connect_button.pack(side="left", padx=20)
 
         self.count_label = tk.Label(self.info_frame,
@@ -166,6 +128,14 @@ class Pubsub_subscriber:
         with open(".env", "w") as outf:
             outf.write(f"PROJECT_ID={project_id}\n")
             outf.write(f"SUBSCRIPTION_NAME={subscription_name}\n")
+
+    def on_connect_button(self):
+        project_id = self.project_id_entry.get()
+        subscription_name = self.subscription_name_entry.get()
+        Pubsub_message_listener(self, project_id, subscription_name)
+
+    def show_error(self, message):
+        messagebox.showerror("Error", message)
 
 
 if __name__ == "__main__":
