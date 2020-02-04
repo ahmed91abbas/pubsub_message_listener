@@ -7,7 +7,7 @@ from pubsub_message_listener import Pubsub_message_listener
 from message_view_gui import Message_view_gui
 
 
-class Pubsub_subscriber:
+class Main:
 
     def __init__(self):
         env = environs.Env()
@@ -34,7 +34,7 @@ class Pubsub_subscriber:
         self.bg_color = '#e6e6ff'
 
         self.root = tk.Tk()
-        self.root.title("Pubsub Subscriber")
+        self.root.title("Pubsub Message Listener")
         self.root.configure(background=self.bg_color)
 
         self.settings_frame = tk.Frame(self.root, bg=self.bg_color)
@@ -122,4 +122,4 @@ class Pubsub_subscriber:
 
 
 if __name__ == "__main__":
-    Pubsub_subscriber()
+    Main()
