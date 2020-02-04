@@ -4,6 +4,7 @@ import json
 from threading import Lock
 import environs
 from pubsub_message_listener import Pubsub_message_listener
+from message_view_gui import Message_view_gui
 
 
 class Pubsub_subscriber:
@@ -104,27 +105,9 @@ class Pubsub_subscriber:
     def mouse_click(self, event):
         widget = event.widget
         index = int(widget.curselection()[0])
-        self.create_view_gui(self.list_items[index])
-
-    def create_view_gui(self, json_data):
-        top = tk.Toplevel()
-        top.title("View window")
-        frame = tk.Frame(top)
-        scrollbar = tk.Scrollbar(frame)
-        scrollbar.pack(side='right', fill=tk.Y)
-        text_box = tk.Text(frame, width=100, height=60)
-        text_box.pack()
-        text_box.config(yscrollcommand=scrollbar.set)
-        scrollbar.config(command=text_box.yview)
-        frame.pack()
-
-        text = json.dumps(json_data,
-                          indent=2,
-                          ensure_ascii=False).encode('utf8')
-        text_box.insert(tk.END, text.decode())
+        Message_view_gui(self.list_items[index])
 
     def save_env_file(self, project_id, subscription_name):
-        print("HERE")
         with open(".env", "w") as outf:
             outf.write(f"PROJECT_ID={project_id}\n")
             outf.write(f"SUBSCRIPTION_NAME={subscription_name}\n")
