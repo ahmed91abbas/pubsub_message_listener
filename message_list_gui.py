@@ -7,7 +7,7 @@ from pubsub_message_listener import Pubsub_message_listener
 from message_view_gui import Message_view_gui
 
 
-class Main:
+class Message_list_gui:
 
     def __init__(self):
         env = environs.Env()
@@ -122,4 +122,4 @@ class Main:
 
 
 if __name__ == "__main__":
-    Main()
+    Message_list_gui()
