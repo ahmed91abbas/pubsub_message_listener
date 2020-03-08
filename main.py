@@ -125,7 +125,7 @@ class Main:
                 self.credentials_entry.delete(0, "end")
                 self.credentials_entry.insert(0, filename)
         google_credentials = self.history["credentials_path"]
-        if not google_credentials:
+        if not google_credentials and os.environ.get("GOOGLE_APPLICATION_CREDENTIALS"):
             google_credentials = os.environ.get("GOOGLE_APPLICATION_CREDENTIALS")
         self.credentials_entry = tk.Entry(credentials_frame_body, width=50)
         self.credentials_entry.insert(0, google_credentials)
@@ -172,7 +172,7 @@ class Main:
             return
         os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = credentials_path
         self.save_current_entries()
-        Message_list_gui()
+        Message_list_gui(self.project_id_entry.get(), self.subscription_entry.get()).run()
 
     def on_emulator_connect(self):
         if not self.valid_pubsub_entries():
@@ -184,7 +184,7 @@ class Main:
             return
         os.environ["PUBSUB_EMULATOR_HOST"] = "{}:{}".format(host, port)
         self.save_current_entries()
-        Message_list_gui()
+        Message_list_gui(self.project_id_entry.get(), self.subscription_entry.get()).run()
 
     def valid_pubsub_entries(self):
         if not self.project_id_entry.get() or not self.subscription_entry.get():

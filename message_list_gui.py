@@ -2,33 +2,22 @@ import tkinter as tk
 from tkinter import messagebox
 import json
 from threading import Lock
-import environs
 from pubsub_message_listener import Pubsub_message_listener
 from message_view_gui import Message_view_gui
 
 
 class Message_list_gui:
 
-    def __init__(self):
-        env = environs.Env()
-        env.read_env()
-        try:
-            self.default_project_id = env("PROJECT_ID")
-            self.default_subscription_name = env("SUBSCRIPTION_NAME")
-        except environs.EnvValidationError:
-            self.default_project_id = ""
-            self.default_subscription_name = ""
+    def __init__(self, project_id, subscription_name):
+        self.project_id = project_id
+        self.subscription_name = subscription_name
         self.lock = Lock()
         self.list_items = []
-        self.create_gui()
-        self.start_gui()
 
-    def update_settings_frame_widgets(self):
-        self.project_id_entry.config(state='disabled')
-        self.subscription_name_entry.config(state='disabled')
-        self.connect_button.config(text='Connected',
-                                   state='disabled',
-                                   bg='#ccfa82')
+    def run(self):
+        self.create_gui()
+        Pubsub_message_listener(self, self.project_id, self.subscription_name)
+        self.root.mainloop()
 
     def create_gui(self):
         self.bg_color = '#e6e6ff'
@@ -37,40 +26,18 @@ class Message_list_gui:
         self.root.title("Pubsub Message Listener")
         self.root.configure(background=self.bg_color)
 
-        self.settings_frame = tk.Frame(self.root, bg=self.bg_color)
         self.info_frame = tk.Frame(self.root, bg=self.bg_color)
-        self.body_frame = tk.Frame(self.root)
-        self.settings_frame.pack(pady=10)
         self.info_frame.pack(pady=10)
+        self.body_frame = tk.Frame(self.root)
         self.body_frame.pack(padx=15, pady=10)
 
-        tk.Label(self.settings_frame,
-                 text="Project ID:",
-                 bg=self.bg_color).pack(side="left")
-        self.project_id_entry = tk.Entry(self.settings_frame, width=40)
-        self.project_id_entry.pack(side="left", padx=5)
-        tk.Label(self.settings_frame,
-                 text="Subscription name:",
-                 bg=self.bg_color).pack(side="left", padx=5)
-        self.subscription_name_entry = tk.Entry(self.settings_frame, width=40)
-        self.subscription_name_entry.pack(side="left")
-        self.project_id_entry.insert(0, self.default_project_id)
-        self.subscription_name_entry.insert(0, self.default_subscription_name)
-        self.connect_button = tk.Button(self.settings_frame,
-                                        text="Connect",
-                                        width=15,
-                                        command=self.on_connect_button)
-        self.connect_button.pack(side="left", padx=20)
-
-        self.count_label = tk.Label(self.info_frame,
-                                    text="Count = 0",
-                                    bg=self.bg_color,
-                                    width=10)
+        tk.Label(self.info_frame, text="Project ID:", bg=self.bg_color).pack(side="left")
+        tk.Label(self.info_frame, text=self.project_id, bg='#ccfa82').pack(side="left")
+        tk.Label(self.info_frame, text="Subscription name:", bg=self.bg_color).pack(side="left")
+        tk.Label(self.info_frame, text=self.subscription_name, bg='#ccfa82').pack(side="left")
+        self.count_label = tk.Label(self.info_frame, text="Count = 0", bg=self.bg_color, width=10)
         self.count_label.pack(side="left")
-        tk.Button(self.info_frame,
-                  text="Clear window",
-                  width=20,
-                  command=self.clear_listbox).pack(side="left", padx=20)
+        tk.Button(self.info_frame, text="Clear window", width=15, command=self.clear_listbox).pack(side="left", padx=20)
 
         scrollbar = tk.Scrollbar(self.body_frame)
         scrollbar.pack(side='right', fill=tk.Y)
@@ -99,27 +66,14 @@ class Message_list_gui:
         self.count_label["text"] = f"Count = {len(self.list_items)}"
         self.listbox.delete(0, tk.END)
 
-    def start_gui(self):
-        self.root.mainloop()
-
     def mouse_click(self, event):
         widget = event.widget
         index = int(widget.curselection()[0])
         Message_view_gui(self.list_items[index])
-
-    def save_env_file(self, project_id, subscription_name):
-        with open(".env", "w") as outf:
-            outf.write(f"PROJECT_ID={project_id}\n")
-            outf.write(f"SUBSCRIPTION_NAME={subscription_name}\n")
-
-    def on_connect_button(self):
-        project_id = self.project_id_entry.get()
-        subscription_name = self.subscription_name_entry.get()
-        Pubsub_message_listener(self, project_id, subscription_name)
 
     def show_error(self, message):
         messagebox.showerror("Error", message)
 
 
 if __name__ == "__main__":
-    Message_list_gui()
+    Message_list_gui("csdf-dsadas", "dasd-dsadsa-dasd-das").run()

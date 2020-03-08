@@ -25,9 +25,6 @@ class Pubsub_message_listener:
                 message.ack()
 
             subscriber.subscribe(subscription_path, callback=callback)
-
-            self.gui.update_settings_frame_widgets()
-            self.gui.save_env_file(self.project_id, self.subscription_name)
         except Exception as e:
             self.gui.show_error(str(e))
 
