@@ -5,3 +5,6 @@ temp/
 .env
 *.pyc
 *spec
+.vscode/
+*.txt
+*.json
