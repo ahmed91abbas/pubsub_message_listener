@@ -9,22 +9,22 @@ class Pubsub_message_listener:
         self.gui = gui
         self.project_id = project_id
         self.subscription_name = subscription_name
-        self.pubsub_listener()
 
-    def pubsub_listener(self):
+    def subscription_callback(self, message):
+        self.gui.add_to_listbox(self.pubsub_message_to_dict(message))
+        message.ack()
+
+    def connect(self):
         try:
             subscriber = pubsub_v1.SubscriberClient()
-            subscription_path = subscriber.subscription_path(
-                self.project_id, self.subscription_name)
+            subscription_path = subscriber.subscription_path(self.project_id, self.subscription_name)
+            self.future = subscriber.subscribe(subscription_path, callback=self.subscription_callback)
+        except Exception as e:
+            self.gui.show_error(str(e))
 
-            # Check if path exists
-            subscriber.get_subscription(subscription_path)
-
-            def callback(message):
-                self.gui.add_to_listbox(self.pubsub_message_to_dict(message))
-                message.ack()
-
-            subscriber.subscribe(subscription_path, callback=callback)
+    def disconnect(self):
+        try:
+            self.future.cancel()
         except Exception as e:
             self.gui.show_error(str(e))
 
