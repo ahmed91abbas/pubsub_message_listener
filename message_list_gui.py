@@ -24,12 +24,11 @@ class Message_list_gui:
         self.bg_color = '#e6e6ff'
         self.connected_color = '#ccfa82'
         self.disconnected_color = '#fc6f6f'
-        font = ('calibri', 12, 'bold')
 
         self.root = tk.Toplevel()
-        self.root.title("Pubsub Message Listener")
+        self.root.title('Pubsub Message Listener')
         self.root.configure(background=self.bg_color)
-        self.root.wm_protocol("WM_DELETE_WINDOW", self.on_close)
+        self.root.wm_protocol('WM_DELETE_WINDOW', self.on_close)
 
         self.top_frame = tk.Frame(self.root, bg=self.bg_color)
         self.top_frame.pack(pady=10)
@@ -38,17 +37,20 @@ class Message_list_gui:
         self.body_frame = tk.Frame(self.root)
         self.body_frame.pack(padx=15, pady=10)
 
-        tk.Label(self.top_frame, text="Project ID", bg=self.bg_color).pack(padx=5, side="left")
-        tk.Label(self.top_frame, text=self.project_id, borderwidth=2, relief="groove", width=35).pack(side="left")
-        tk.Label(self.top_frame, bg=self.bg_color).pack(padx=5, side="left")
-        tk.Label(self.top_frame, text="Subscription name", bg=self.bg_color).pack(padx=5, side="left")
-        tk.Label(self.top_frame, text=self.subscription_name, borderwidth=2, relief="groove", width=35).pack(side="left")
-        self.connect_button = tk.Button(self.top_frame, text="disconnected", bg=self.disconnected_color, width=15, command=self.on_connect_button)
-        self.connect_button.pack(side="left", padx=20)
+        tk.Label(self.top_frame, text='Project ID', bg=self.bg_color).pack(padx=5, side='left')
+        tk.Label(self.top_frame, text=self.project_id, borderwidth=2, relief='groove', width=35).pack(side='left')
+        tk.Label(self.top_frame, bg=self.bg_color).pack(padx=5, side='left')
+        tk.Label(self.top_frame, text='Subscription name', bg=self.bg_color).pack(padx=5, side='left')
+        tk.Label(self.top_frame, text=self.subscription_name, borderwidth=2, relief='groove',
+                 width=35).pack(side='left')
+        self.connect_button = tk.Button(self.top_frame, text='disconnected', bg=self.disconnected_color, width=15,
+                                        command=self.on_connect_button)
+        self.connect_button.pack(side='left', padx=20)
 
-        self.count_label = tk.Label(self.info_frame, text="Count = 0", bg=self.bg_color, width=10)
-        self.count_label.pack(side="left")
-        tk.Button(self.info_frame, text="Clear window", width=15, command=self.clear_listbox).pack(side="left", padx=20)
+        self.count_label = tk.Label(self.info_frame, text='Count = 0', bg=self.bg_color, width=10)
+        self.count_label.pack(side='left')
+        tk.Button(self.info_frame, text='Clear window', width=15, command=self.clear_listbox).pack(side='left',
+                                                                                                   padx=20)
 
         scrollbar = tk.Scrollbar(self.body_frame)
         scrollbar.pack(side='right', fill=tk.Y)
@@ -71,7 +73,7 @@ class Message_list_gui:
         self.lock.acquire()
 
         self.list_items.append(json_data)
-        self.count_label["text"] = f"Count = {len(self.list_items)}"
+        self.count_label['text'] = f'Count = {len(self.list_items)}'
         text = json.dumps(json_data, ensure_ascii=False).encode('utf8')
 
         self.listbox.insert(tk.END, text.decode())
@@ -82,7 +84,7 @@ class Message_list_gui:
 
     def clear_listbox(self):
         self.list_items = []
-        self.count_label["text"] = f"Count = {len(self.list_items)}"
+        self.count_label['text'] = f'Count = {len(self.list_items)}'
         self.listbox.delete(0, tk.END)
 
     def mouse_click(self, event):
@@ -91,12 +93,12 @@ class Message_list_gui:
         Message_view_gui(self.list_items[index])
 
     def show_error(self, message):
-        messagebox.showerror("Error", message)
+        messagebox.showerror('Error', message)
 
     def on_close(self):
         self.message_listener.disconnect()
         self.root.destroy()
 
 
-if __name__ == "__main__":
-    Message_list_gui("test-project-id", "test-pubsub-topic-subscription").run()
+if __name__ == '__main__':
+    Message_list_gui('test-project-id', 'test-pubsub-topic-subscription').run()
