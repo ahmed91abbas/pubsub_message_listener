@@ -1,12 +1,16 @@
 import json
 import sys
 import os
-
+import requests
+import webbrowser
 import tkinter as tk
 from tkinter import filedialog
 from tkinter import messagebox
 
 from message_list_gui import Message_list_gui
+
+
+CURRENT_VERSION = 1.1
 
 
 class Main:
@@ -56,6 +60,16 @@ class Main:
         self.root.configure(background=bg_color)
         self.root.title("Pub/Sub Message Listener")
         self.root.wm_protocol("WM_DELETE_WINDOW", self.on_close)
+
+        # menu components
+        menu = tk.Menu(self.root)
+        self.root.config(menu=menu)
+        helpmenu = tk.Menu(menu, tearoff=0)
+        menu.add_cascade(label="Help", menu=helpmenu)
+        helpmenu.add_command(label="Open Github page", command=self.on_open_github)
+        helpmenu.add_command(label="Open download page", command=self.on_open_download_page)
+        helpmenu.add_command(label="Check for updates", command=self.check_for_updates)
+        helpmenu.add_command(label="About", command=self.on_about)
 
         entry_frame = tk.Frame(self.root, bg=bg_color)
         entry_frame.pack(padx=padx, pady=pady, fill='both')
@@ -211,6 +225,37 @@ class Main:
             self.history["emulator_port"] = self.port_entry.get()
 
         self.save_json("history.json", self.history)
+
+    def check_for_updates(self):
+        url = "https://api.github.com/repos/ahmed91abbas/pubsub_message_listener/releases/latest"
+        response = requests.get(url)
+        if response.status_code == 200:
+            response = response.json()
+            version_tag = response["tag_name"]
+            print(version_tag)
+            online_version = float(version_tag[1:])
+            if online_version > CURRENT_VERSION:
+                ans = messagebox.askyesno('Check for updates', f'Version {version_tag}'
+                    f' is available. Current version is v{CURRENT_VERSION}'\
+                    f'\nDo you want to open the download page?')
+                if ans:
+                    self.on_open_download_page()
+            else:
+                messagebox.showinfo("Check for updates", f"Current version v{CURRENT_VERSION} is up to date.")
+
+    def on_open_github(self):
+        url = "https://github.com/ahmed91abbas/pubsub_message_listener"
+        webbrowser.open(url, new=0, autoraise=True)
+
+    def on_open_download_page(self):
+        url = "https://github.com/ahmed91abbas/pubsub_message_listener/releases/latest"
+        webbrowser.open(url, new=0, autoraise=True)
+
+    def on_about(self):
+        msg = 'This application is used to view messages published on a Pub/Sub topic '\
+              'using asynchronous pulling. You can either connect it to GCP or locally '\
+              'to an emulator.'
+        messagebox.showinfo(f'About Pub/Sub Message Listener v{CURRENT_VERSION}', msg)
 
     def on_close(self):
         self.root.destroy()
