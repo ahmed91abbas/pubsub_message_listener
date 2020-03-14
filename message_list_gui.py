@@ -24,6 +24,7 @@ class Message_list_gui:
         self.bg_color = '#e6e6ff'
         self.connected_color = '#ccfa82'
         self.disconnected_color = '#fc6f6f'
+        font = ('calibri', 12, 'bold')
 
         self.root = tk.Toplevel()
         self.root.title("Pubsub Message Listener")
@@ -37,8 +38,11 @@ class Message_list_gui:
         self.body_frame = tk.Frame(self.root)
         self.body_frame.pack(padx=15, pady=10)
 
-        text = '{} / {}'.format(self.project_id, self.subscription_name)
-        tk.Label(self.top_frame, text=text, bg=self.bg_color).pack(side="left")
+        tk.Label(self.top_frame, text="Project ID", bg=self.bg_color).pack(padx=5, side="left")
+        tk.Label(self.top_frame, text=self.project_id, borderwidth=2, relief="groove", width=35).pack(side="left")
+        tk.Label(self.top_frame, bg=self.bg_color).pack(padx=5, side="left")
+        tk.Label(self.top_frame, text="Subscription name", bg=self.bg_color).pack(padx=5, side="left")
+        tk.Label(self.top_frame, text=self.subscription_name, borderwidth=2, relief="groove", width=35).pack(side="left")
         self.connect_button = tk.Button(self.top_frame, text="disconnected", bg=self.disconnected_color, width=15, command=self.on_connect_button)
         self.connect_button.pack(side="left", padx=20)
 
@@ -95,4 +99,4 @@ class Message_list_gui:
 
 
 if __name__ == "__main__":
-    Message_list_gui("csdf-dsadas", "dasd-dsadsa-dasd-das").run()
+    Message_list_gui("test-project-id", "test-pubsub-topic-subscription").run()
